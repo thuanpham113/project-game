@@ -1,6 +1,6 @@
 <template>
 
-	<v-layout column class="overflow-y-auto pa-4" align-center fill-height style="background-image: url('https://img.freepik.com/free-vector/background-with-red-lanterns-chinese-design_1308-37181.jpg?w=2000&t=st=1706819416~exp=1706820016~hmac=dbb0777a1ae6c7bdaf37a1ab7120113c19b711c2df7e0cf477ec9c630f0b138b'); background-size: cover;" >
+	<v-layout column class="overflow-y-auto pa-4 pt-16" align-center fill-height style="background-image: url('/6466383.jpg'); background-size: cover;" >
 			<div class="text-center lottery-text my-16 white--text">
 				{{ title }}
 			</div>
