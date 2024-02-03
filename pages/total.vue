@@ -2,15 +2,15 @@
 	<v-layout row wrap d-flex align-center justify-center class="pa-16">
 		<table>
 
-			<tbody v-for="(rank,indexRank) in listRanks" :key="indexRank">
+			<tbody v-for="(rank, indexRank) in listRanks" :key="indexRank">
 				<tr>
-					<th scope="col" colspan="4" class="text-h5 font-weight-bold cell-title">{{rank?.attributes?.Name}}</th>
+					<th scope="col" colspan="3" class="text-h5 font-weight-bold cell-title">{{ rank?.attributes?.Name }}</th>
 				</tr>
-				<tr v-for="(Member, indexMember) in award.filter(val => val?.attributes?.Rank === rank?.attributes?.Rank)" :key="indexMember" class="text-h5">
-					<td>{{indexMember + 1}}</td>
-					<td>{{Member.attributes.Number}}</td>
-					<td>{{Member.attributes.Name}}</td>
-					<td>{{Member.attributes.Phone}}</td>
+				<tr v-for="(Member, indexMember) in award.filter(val => val?.attributes?.Rank === rank?.attributes?.Rank)"
+					:key="indexMember" class="text-h5">
+					<td>{{ indexMember + 1 }}</td>
+					<td>{{ Member.attributes.Number }}</td>
+					<td>{{ Member.attributes.Name }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -21,7 +21,7 @@
 import axiosClient from "~/api/clientAPI";
 export default {
 	data() {
-		return{
+		return {
 			listRanks: [],
 			award: []
 		}
@@ -34,7 +34,7 @@ export default {
 			this.fetchData();
 		}, 1000);
 	},
-  	methods: {
+	methods: {
 		async fetchData() {
 			let listAward = []
 			this.listRanks = (await axiosClient.get("/list-ranks")).data.data
@@ -45,14 +45,14 @@ export default {
 				const award = (await axiosClient.get(`/awards?pagination[page]=${index}`))
 				const dataAward = award.data.data
 				pagination = award.data.meta.pagination
-
 				index++;
+
 				listAward.push(...dataAward)
 			} while (pagination.page !== pagination.pageCount)
 
 			this.award = [...listAward]
 		}
-  }
+	}
 }
 </script>
 
@@ -66,7 +66,7 @@ table {
 	background-color: #F9FBE7;
 }
 
-.cell-title{
+.cell-title {
 	background-color: #ECCDB4;
 }
 

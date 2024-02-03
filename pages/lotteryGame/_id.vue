@@ -82,13 +82,7 @@ export default {
 						text: "Name",
 						value: "Name",
 						align: "center"
-					},
-					{
-						text: "Phone",
-						value: "Phone",
-						width: "200px",
-						align: "center"
-					},
+					}
 			],
 			title: undefined,
 			loadSave: false
