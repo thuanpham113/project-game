@@ -1,10 +1,10 @@
 import axios from "axios";
-const BASEURL = "http://0.0.0.0:1338/api";
+const BASEURL = "http://192.168.1.2:1338/api";
 
 const axiosClient = axios.create({
 	baseURL: BASEURL,
 	headers: {
-        Authorization: "Bearer e28a9b192a75797d6cda00b1545aae3586c05ac2695326910876b24d1c8c8a74a398fe3cea7d6c3181d6d961091fa8b7f3a4c614a6d0236f19dc41e091166c7d4258e062f4c35d2b7871b7d719efca91819fd04eb172c4f88cdf2b1151b1b85561581651a7ec9cc86076fe959230983ce9c1933e1a37e4f1a18a50fed165dd96"
+        Authorization: "Bearer 56fb467900871ac8cef9b5d568a24610e413797f6b1129d6c51c587b065ff916763eff359f80f9df651ea75accaec7359bb278d019d272af34b68a231bd63fdb4dc1f77050ca11e2a8cf70d036cbe59b6951b820f70599177af8e4f0ba8e18d0d7bf6eec8035a79ab6295d0e2d4cbd716b14df2b40e92f11b38502726880ca04"
     }
 });
 
