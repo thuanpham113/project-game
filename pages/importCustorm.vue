@@ -69,17 +69,19 @@
 				</div>
 			</v-card>
 
-			<v-card class="mx-16 my-2 pa-4 d-flex" v-for="(item, index) in dataRepost" :key="`card-${index}`" id="listCard" elevation="24" rounded="lg">
-				<div style="width: 30%;" class="text-center">
-					{{ item.Name }}
-				</div>
-				<div style="width: 30%;" class="text-center">
-					{{ item.Money }}
-				</div>
-				<div style="width: 40%;" class="text-center">
-					{{ item.Number }}
-				</div>
-			</v-card>
+			<div id="list">
+				<!-- <v-card class="mx-16 d-flex" v-for="(item, index) in dataRepost" :key="`card-${index}`" id="listCard" :name="`card-${dataRepost.length-index}`" elevation="24" rounded="lg" :style="index?'padding: 16px; marginBottom: 8px':'height: 0; marginBottom: 0; font-size: 0; padding: 0; transition: none'">
+					<div style="width: 30%;" class="text-center">
+						{{ item.Name }}
+					</div>
+					<div style="width: 30%;" class="text-center">
+						{{ item.Money }}
+					</div>
+					<div style="width: 40%;" class="text-center">
+						{{ item.Number }}
+					</div>
+				</v-card> -->
+			</div>
 		</v-container>
 
 
@@ -89,6 +91,7 @@
 </template>
 
 <script>
+import { set } from 'vue';
 import axiosClient from "../api/clientAPI";
 export default {
 	data()  {
@@ -214,6 +217,34 @@ export default {
 					Money: this.convertMoney(dataRepost.Money + "0000"),
 					Number: item
 				}, ...this.dataRepost]
+				const listGroup = document.getElementById("list")
+				const newList = document.createElement("div")
+				newList.classList.add("mx-16", "d-flex", "v-card")
+				newList.setAttribute("id", "listCard")
+				newList.setAttribute("elevation", "24")
+				newList.setAttribute("rounded", "lg")
+				newList.setAttribute("style", "transition: all 1s cubic-bezier(.36,-0.64,.34,1.76); transform: rotateX(90deg); height: 0; font-size: 0; padding: 0; margin-bottom: 0")
+				newList.innerHTML = `
+					<div style="width: 30%;" class="text-center">
+						${dataRepost.Name}
+					</div>
+					<div style="width: 30%;" class="text-center">
+						${this.convertMoney(dataRepost.Money + "0000")}
+					</div>
+					<div style="width: 40%;" class="text-center">
+						${ranges}
+					</div>
+				`
+				listGroup.insertBefore(newList, listGroup.firstChild)
+
+				setTimeout(() => {
+					newList.style.height = "auto"
+					newList.style.fontSize = "1rem"
+					newList.style.padding = "16px"
+					newList.style.marginBottom = "8px"
+					newList.style.transform = "rotateX(0deg)"
+					// document.getElementsByName(`card-${this.dataRepost.length}`)[0].scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+				}, 10)
 			})
 		},
 		convertMoney(value) {
@@ -232,7 +263,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .lottery-text {
 	font-family: "Alfa Slab One", serif;
 	font-weight: 200;
@@ -252,13 +283,29 @@ export default {
 #listCard:nth-last-child(even) {
 	background: #FEFFD2;
 }
+#listCard:nth-last-child(odd) {
+	background: #ffffff;
+}
+
+#listCard{
+	transition: all 1s ease-in-out;
+	border: 2px solid;
+	border-radius: 8px;
+}
+
+#listCard.show {
+	height: 100px;
+	transform: scale(1, 1);
+}
 
 @keyframes transfer {
 	0% {
-		transform: scale(1,0);
+		height: 0;
+		font-size: 0;
 	}
 	100% {
-		transform: scale(1,1);
+		height: auto;
+		font-size: 1rem;
 	}
 }
 

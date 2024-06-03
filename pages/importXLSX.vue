@@ -70,10 +70,14 @@ export default {
 
 				let columnName
 				let columnNumber
+				let columnAddress
+				let columnPhone
 
 				Object.keys(sheet).map(key => {
 					if (sheet[key]?.v === "name") columnName = key.match(/[A-z]+/g)[0]
 					if (sheet[key]?.v === "number") columnNumber = key.match(/[A-z]+/g)[0]
+					if (sheet[key]?.v === "address") columnAddress = key.match(/[A-z]+/g)[0]
+					if (sheet[key]?.v === "phone") columnPhone = key.match(/[A-z]+/g)[0]
 				})
 
 				for (let index = 2; index < column; index++) {
@@ -82,6 +86,8 @@ export default {
 							data: {
 								Name: sheet[columnName+index]?.v,
 								Number: String(sheet[columnNumber+index]?.v.toString().padStart(4, "0")),
+								Address: sheet[columnAddress+index]?.v,
+								Phone: sheet[columnPhone+index]?.v
 							}
 						})
 
