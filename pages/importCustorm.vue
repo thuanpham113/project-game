@@ -143,7 +143,7 @@ export default {
 			}
 			this.numberRepost = []
 			this.loading = true
-			this.indexNumber = (await axiosClient.get("/user-games?sort[1]=Number:desc&pagination[pageSize]=1")).data.data[0].attributes.Number
+			this.indexNumber = (await axiosClient.get("/user-games?sort[1]=Number:desc&pagination[pageSize]=1")).data.data[0]?.attributes.Number ?? 0
 			this.phone = this.phone.replace(/ /g, "")
 			for (let index = 0; index < this.money; index++) {
 				await this.createNumber({
