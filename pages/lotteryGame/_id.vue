@@ -240,6 +240,7 @@ export default {
 					request = await axiosClient.post("/awards", {
 						data: {
 							...val,
+							Number: Number(val.Number),
 							Rank: this.rank.toString().padStart(3, "0")
 						}
 					})

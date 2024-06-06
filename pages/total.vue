@@ -4,13 +4,15 @@
 
 			<tbody v-for="(rank, indexRank) in listRanks" :key="indexRank">
 				<tr>
-					<th scope="col" colspan="3" class="text-h5 font-weight-bold cell-title">{{ rank?.attributes?.Name }}</th>
+					<th scope="col" colspan="5" class="text-h5 font-weight-bold cell-title">{{ rank?.attributes?.Name }}</th>
 				</tr>
 				<tr v-for="(Member, indexMember) in award.filter(val => val?.attributes?.Rank === rank?.attributes?.Rank)"
 					:key="indexMember" class="text-h5">
 					<td>{{ indexMember + 1 }}</td>
-					<td>{{ Member.attributes.Number }}</td>
+					<td>{{ Member.attributes.Number.toString().padStart(4,"0") }}</td>
 					<td>{{ Member.attributes.Name }}</td>
+					<td>{{ Member.attributes.Phone }}</td>
+					<td>{{ Member.attributes.Address }}</td>
 				</tr>
 			</tbody>
 		</table>
