@@ -78,11 +78,21 @@ export default {
 					value: "Number",
 					width: "100px",
 				},
-					{
-						text: "Name",
-						value: "Name",
-						align: "center"
-					}
+				{
+					text: "Name",
+					value: "Name",
+					align: "center"
+				},
+				{
+					text: "Address",
+					value: "Address",
+					align: "center"
+				},
+				{
+					text: "Phone",
+					value: "Phone",
+					align: "center"
+				}
 			],
 			title: undefined,
 			loadSave: false
@@ -141,6 +151,8 @@ export default {
 				const dateList = await this.checkNumber(this.numberFinish);
 				listMember = [{...dateList[0]?.attributes}]
 			}
+
+			console.log(listMember)
 
 			this.award = listMember.filter(data => !!data).map(val => {
 				return {
@@ -202,7 +214,15 @@ export default {
 		async checkNumber(number) {
 			const data = (await axiosClient.get(`/user-games?filters[Number][$eq]=${number}`)).data.data
 
-			return data
+			return data.map(val => {
+				return {
+					...val,
+					attributes: {
+						...val.attributes,
+						Number: val.attributes.Number.toString().padStart(4, "0")
+					}
+				}
+			})
 		},
 		async setListAward(data, rank) {
 			const request = await axiosClient.post("/awards", {
