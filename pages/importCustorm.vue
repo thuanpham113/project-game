@@ -4,12 +4,25 @@
 			<v-form style="width: calc(100% - 150px);">
 				<div class="d-flex" style="width: 100%;">
 					<v-text-field
-						name="money"
-						label="Số"
+						name="startNumber"
+						label="Từ số"
 						outlined
 						id="id"
-						:value="money"
-						@change="value => money = value"
+						:value="startNumber"
+						@change="value => startNumber = Number(value)"
+						hint="Số này đã có"
+						suffix="số"
+						class="pa-2"
+						hide-details=""
+						style="width: 15%"
+					></v-text-field>
+					<v-text-field
+						name="endNumber"
+						label="Đến số"
+						outlined
+						id="id"
+						:value="endNumber"
+						@change="value => endNumber = Number(value)"
 						suffix="số"
 						class="pa-2"
 						hide-details
@@ -30,11 +43,21 @@
 						label="Số điện thoại"
 						outlined
 						v-model="phone"
+						@change="searchDataUser()"
 						id="id"
 						hide-details
 						class="pa-2"
 						style="width: 20%"
-					></v-text-field>
+					>
+						<template v-slot:append>
+							<v-tooltip top>
+								<template v-slot:activator="{ on }">
+									<v-icon v-on="on" color="amber" :disabled="!autoFill.boolean" @click="writeFill">mdi-flash</v-icon>
+								</template>
+								Tự điền thông tin
+							</v-tooltip>
+						</template>
+					</v-text-field>
 				</div>
 				<v-text-field
 					name="address"
@@ -46,25 +69,77 @@
 					style="width: 100%"
 					hide-details
 				></v-text-field>
+				<v-text-field
+					name="organization"
+					label="Hội đoàn"
+					v-model="organization"
+					outlined
+					id="id"
+					class="pa-2"
+					style="width: 100%"
+					hide-details
+				></v-text-field>
 			</v-form>
-			<v-btn color="success" :disabled="loading" x-large class="my-2 mx-2" width="150" height="125" @click="importData()">Nhập</v-btn>
+			<v-btn
+				color="success"
+				:disabled="
+					loading ||
+					!name ||
+					!phone ||
+					!startNumber ||
+					dataEndNumber == startNumber ||
+					(
+						!!endNumber &&
+						(
+							startNumber > endNumber ||
+							!(
+								Math.max(dataEndNumber, startNumber, endNumber) === dataEndNumber ||
+								Math.min(dataEndNumber, startNumber, endNumber) === dataEndNumber
+							)
+						)
+					)
+				"
+				x-large
+				class="my-2 mx-2"
+				width="150"
+				height="125"
+				@click="importData()"
+			>
+				Nhập
+			</v-btn>
 		</v-card>
 
+		<v-alert
+			v-if="
+				(!! startNumber && dataEndNumber == startNumber) ||
+				(
+					!! endNumber &&
+					!(
+						Math.max(dataEndNumber, startNumber, endNumber) === dataEndNumber ||
+						Math.min(dataEndNumber, startNumber, endNumber) === dataEndNumber
+					)
+				)
+			"
+			transition="scale-transition"
+			type="error"
+		>
+			{{
+				`Số ${dataEndNumber} đã có có trong dữ liệu`
+			}}
+		</v-alert>
 
 
-		<h1 class="white--text">
+
+		<!-- <h1 class="white--text">
 			{{ money }} số x 10 000 = {{ this.displayMoney }} 000 VNĐ
-		</h1>
+		</h1> -->
 
 		<v-container style="max-width: 1050px">
 			<v-card v-if="dataRepost.length" class="ma-16 mb-2 pa-4 d-flex font-weight-bold" outlined color="#FFD0D0" rounded="lg" style="border: 2px solid;">
 				<div style="width: 30%;" class="text-center">
 					Tên
 				</div>
-				<div style="width: 30%;" class="text-center">
-					Số Tiền
-				</div>
-				<div style="width: 40%;" class="text-center">
+				<div style="width: 70%;" class="text-center">
 					Số đã mua
 				</div>
 			</v-card>
@@ -99,15 +174,29 @@ export default {
 			files: [],
 			totalLoad: undefined,
 			nameLoad: undefined,
-			money: 1,
+			startNumber: undefined,
+			endNumber: undefined,
 			name: "",
 			phone: "",
+			organization: "",
 			address: "",
 			displayMoney: 10,
 			indexNumber: 0,
 			numberRepost:[],
 			dataRepost: [],
-			displayNumber: [],
+			checkStartNumber: undefined,
+			checkEndNumber: undefined,
+			dataEndNumber: undefined,
+			autoFill: {
+				boolean: false,
+				data: {
+					Name: "",
+					Phone: "",
+					Address: "",
+					Organization: ""
+				}
+			},
+			// displayNumber: [],
 			loading: false,
 		}
 	},
@@ -115,11 +204,7 @@ export default {
 		// listen for the event key esc
 		window.addEventListener('keyup', (e)=>{
 			if(e.key === 'Escape') {
-				this.money = 1
-				this.name = ""
-				this.phone = ""
-				this.address = ""
-				this.displayNumber = ""
+				this.resetData()
 			}
 		})
 
@@ -129,42 +214,108 @@ export default {
 			console.log(this.files)
 		},
 
-		money() {
-			let value = String(this.money * 10)
+		async startNumber(value) {
+			if (value) {
+				this.dataEndNumber = Number((await axiosClient.get(`/user-games?sort[1]=Number:asc&pagination[pageSize]=1&filters[Number][$gte]=${this.startNumber}`)).data.data[0]?.attributes.Number ?? 0)
+			}
+		},
 
-			this.displayMoney = this.convertMoney(value)
-		}
+		// money() {
+		// 	let value = String(this.money * 10)
+
+		// 	this.displayMoney = this.convertMoney(value)
+		// }
 	},
 	methods: {
+		writeFill() {
+			console.log("this.autoFill.data")
+			this.name = this.autoFill.data.Name
+			this.phone = this.autoFill.data.Phone
+			this.address = this.autoFill.data.Address
+			this.organization = this.autoFill.data.Organization
+		},
+		searchDataUser() {
+			if (this.phone.length === 10) {
+				axiosClient.get(`/user-games?filters[Phone]=${this.phone}`).then((res) => {
+					console.log(res.data.data)
+					if (res.data.data.length) {
+						this.autoFill.boolean = true
+						this.autoFill.data = {
+							Name: res.data.data[0].attributes.Name,
+							Phone: res.data.data[0].attributes.Phone,
+							Address: res.data.data[0].attributes.Address,
+							Organization: res.data.data[0].attributes.Organization
+						}
+					} else {
+						this.autoFill.boolean = false
+					}
+				})
+			} else {
+				this.autoFill.boolean = false
+			}
+		},
 		async importData() {
-			if (this.name === "" || this.phone === "" || this.address === "") {
+			if (
+					this.name === "" ||
+					this.phone === "" ||
+					!this.startNumber ||
+					this.dataEndNumber === this.startNumber ||
+					(
+						!!this.endNumber &&
+						(
+							this.startNumber > this.endNumber ||
+							!(
+								Math.max(this.dataEndNumber, this.startNumber, this.endNumber) === this.dataEndNumber ||
+								Math.min(this.dataEndNumber, this.startNumber, this.endNumber) === this.dataEndNumber
+							)
+						)
+					)
+				) {
 				console.log("Vui lòng nhập đầy đủ thông tin")
 				return
 			}
 			this.numberRepost = []
 			this.loading = true
-			this.indexNumber = (await axiosClient.get("/user-games?sort[1]=Number:desc&pagination[pageSize]=1")).data.data[0]?.attributes.Number ?? 0
+			this.indexNumber = this.startNumber
 			this.phone = this.phone.replace(/ /g, "")
-			for (let index = 0; index < this.money; index++) {
-				await this.createNumber({
-					data: {
-						Name: this.name,
-						Number: this.indexNumber,
-						Phone: this.phone,
-						Address: this.address
-					}
-				}, this.indexNumber, 1)
+			await Promise.all(
+				Array.from(
+					{ length: (this.endNumber != 0 && this.endNumber) ? (this.endNumber - this.startNumber + 1) : 1 },
+					(_, i) => i + this.startNumber
+				).map(async (index) => {
+					await this.createPermanentNumber({
+						data: {
+							Name: this.name,
+							Number: index,
+							Phone: this.phone,
+							Address: this.address,
+							Organization: this.organization
+						}
+					}, index);
 
-				this.nameLoad = this.name;
-			}
+					this.nameLoad = this.name;
+				})
+			);
 
 			this.headleNumber({
 				Name: this.name,
 				Phone: this.phone,
 				Address: this.address,
+				Organization: this.organization,
 				Money: this.money
 			});
 			this.loading = false
+			this.resetData()
+		},
+		async createPermanentNumber(data, number) {
+			try {
+				const repost = await axiosClient.post("/user-games",data)
+
+				this.numberRepost.push(Number(repost.data.data.attributes.Number))
+
+			} catch(error) {
+				this.$root.$emit("alert", {mess: `Số ${number.toString().padStart(4,"0")}: đã tồn tại`})
+			}
 		},
 		async createNumber(data, number,  difference) {
 			try {
@@ -180,7 +331,19 @@ export default {
 				await this.createNumber(data, number, difference + 1)
 			}
 		},
+		resetData() {
+			this.startNumber = undefined
+			this.endNumber = undefined
+			this.name = ""
+			this.phone = ""
+			this.address = ""
+			this.displayNumber = ""
+			this.checkEndNumber = undefined
+			this.checkStartNumber = undefined
+			this.organization = ""
+		},
 		headleNumber(dataRepost) {
+			console.log(this.numberRepost, "numberRepost")
 			let arrayNumber = this.numberRepost.sort((a, b) => a - b)
 			const ranges = [];
 			let start = null;
@@ -212,9 +375,9 @@ export default {
 			}
 
 			ranges.forEach((item) => {
+				console.log(item)
 				this.dataRepost = [{
 					...dataRepost,
-					Money: this.convertMoney(dataRepost.Money + "0000"),
 					Number: item
 				}, ...this.dataRepost]
 				const listGroup = document.getElementById("list")
@@ -228,10 +391,7 @@ export default {
 					<div style="width: 30%;" class="text-center">
 						${dataRepost.Name}
 					</div>
-					<div style="width: 30%;" class="text-center">
-						${this.convertMoney(dataRepost.Money + "0000")}
-					</div>
-					<div style="width: 40%;" class="text-center">
+					<div style="width: 70%;" class="text-center">
 						${ranges}
 					</div>
 				`
