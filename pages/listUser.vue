@@ -75,7 +75,7 @@ export default {
 
 			const arrayData = []
 			for (let index = 0; index < request.data.meta.pagination.pageCount; index++) {
-				arrayData.push(async() => await axiosClient.get(`/user-games?pagination[pageSize]=100&pagination[page]=${index + 1}`))
+				arrayData.push(async() => await axiosClient.get(`/user-games?pagination[pageSize]=100&pagination[page]=${index + 1}&sort[0]=Number:asc`))
 			}
 
 			const result =  []
